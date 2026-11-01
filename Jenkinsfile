@@ -27,6 +27,17 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
@@ -43,7 +54,7 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh 'sleep 5'
-                sh 'curl -f http://127.0.0.1:5000/health'
+                sh 'curl -f http://localhost:5000/health'
             }
         }
     }
